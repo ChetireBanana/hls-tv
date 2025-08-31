@@ -1,0 +1,20 @@
+<resources>
+    <string name="app_name">hls-tv</string>
+    <string name="error_message">Что-то пошло не так</string>
+    <string name="error_picture_description">Error</string>
+    <string name="try_again_button">Попробовать снова</string>
+    <string name="loading">Загрузка</string>
+    <string name="no_group">Без группы</string>
+    <string name="chosen_channels">Выбранные каналы</string>
+    <string name="chose_channel">Выберите каналы</string>
+    <string name="select_channel_count_content_description">Select Channel Count</string>
+    <string name="start_player_content_description">Start Player</string>
+    <string name="chose_screen_count">Выберите количество экранов</string>
+    <string name="play_pause_content_description">Play/Pause</string>
+    <string name="speed_down_content_description">Speed Down</string>
+    <string name="speed_up_content_description">Speed Up</string>
+    <string name="zoom_out_content_description">Zoom Out</string>
+    <string name="zoom_in_content_description">Zoom In</string>
+    <string name="mute_unmute_content_description">Mute/Unmute</string>
+    <string name="loading_channels_error">Ошибка загрузки каналов</string>
+</resources>
