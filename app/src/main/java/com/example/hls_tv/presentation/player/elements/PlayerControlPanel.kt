@@ -1,5 +1,6 @@
 package com.example.hls_tv.presentation.player.elements
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -16,6 +17,7 @@ import androidx.compose.material3.Slider
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -40,7 +42,11 @@ fun PlayerControlPanel(
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(8.dp)
+            .padding(
+                horizontal = 16.dp,
+            )
+            .background(Color.Black.copy(alpha = 0.3f)),
+
     ) {
 
         Row(verticalAlignment = Alignment.CenterVertically) {
@@ -61,7 +67,13 @@ fun PlayerControlPanel(
         Row(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween,
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(
+                    start = 16.dp,
+                    end = 16.dp,
+                    bottom = 8.dp
+                )
         ) {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
