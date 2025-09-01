@@ -1,5 +1,6 @@
 package com.example.hls_tv.presentation.player.elements
 
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -15,6 +16,10 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Slider
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -38,6 +43,7 @@ fun PlayerControlPanel(
     currentPosition: Long
 ) {
     val duration = playerState.activeDurationMs.coerceAtLeast(1000L)
+    var sliderIsMoving by remember { mutableStateOf(false) }
 
     Column(
         modifier = Modifier
@@ -51,13 +57,21 @@ fun PlayerControlPanel(
 
         Row(verticalAlignment = Alignment.CenterVertically) {
 
+            val animatedPosition by animateFloatAsState(
+                targetValue = if (sliderIsMoving) 0f else currentPosition.toFloat(),
+            )
+
             Slider(
-                value = currentPosition.toFloat(),
+                value = if (sliderIsMoving) currentPosition.toFloat() else animatedPosition,
                 onValueChange = {
+                    sliderIsMoving = true
                     onSetCurrentPositionSeek(it.toLong())
                 },
+                onValueChangeFinished = {
+                    sliderIsMoving = false
+                },
                 valueRange = 0f..duration.toFloat(),
-                modifier = Modifier.weight(1f)
+                modifier = Modifier.weight(1f),
             )
 
         }
