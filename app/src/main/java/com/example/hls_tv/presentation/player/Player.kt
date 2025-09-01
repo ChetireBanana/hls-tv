@@ -1,6 +1,5 @@
 package com.example.hls_tv.presentation.player
 
-import android.R.attr.maxWidth
 import android.annotation.SuppressLint
 import android.content.res.Configuration
 import android.util.Log
@@ -17,14 +16,13 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentHeight
-import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.SmallFloatingActionButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -52,6 +50,7 @@ import com.example.hls_tv.presentation.elements.Error
 import com.example.hls_tv.presentation.elements.Loader
 import com.example.hls_tv.presentation.player.elements.PlayerChannelItem
 import com.example.hls_tv.presentation.player.elements.PlayerControlPanel
+import kotlinx.coroutines.delay
 import kotlin.math.ceil
 
 
@@ -103,7 +102,7 @@ fun PlayerScreenContainer(
                     onVolumeChange = { volume -> viewModel.setVolume(volume) },
                     onMuteToggle = { viewModel.toggleMute() },
                     onZoomChange = { zoom -> viewModel.setZoom(zoom) },
-                    onSeek = { position -> viewModel.setCurrentPosition(position) },
+                    onSetCurrentPosition = { position -> viewModel.setCurrentPosition(position) },
                     onChannelSelected = { channel -> viewModel.setActiveChannel(channel) },
                     onDurationChange = { duration -> viewModel.updateActiveDuration(duration) },
                     onSelectChannelsClicked = { viewModel.selectChannels() }
@@ -123,7 +122,7 @@ fun PlayerScreen(
     onVolumeChange: (Float) -> Unit,
     onMuteToggle: () -> Unit,
     onZoomChange: (Float) -> Unit,
-    onSeek: (Long) -> Unit,
+    onSetCurrentPosition: (Long) -> Unit,
     onChannelSelected: (Channel) -> Unit,
     onDurationChange: (Long) -> Unit,
     onSelectChannelsClicked: () -> Unit,
@@ -131,15 +130,15 @@ fun PlayerScreen(
 ) {
     val context = LocalContext.current
     var controlsVisible by remember { mutableStateOf(true) }
+    var currentPosition by remember { mutableStateOf(0L) }
 
     val exoPlayers = remember(playerState.allChannels, preview) {
         if (preview) return@remember emptyMap()
+
         playerState.allChannels.associateWith { channel ->
             ExoPlayer.Builder(context).build().apply {
                 setMediaItem(MediaItem.fromUri(channel.url))
                 playWhenReady = true
-                volume =
-                    if (channel == playerState.activeChannel && !playerState.isMuted) playerState.volume else 0f
                 addListener(object : Player.Listener {
                     override fun onPlaybackStateChanged(playbackState: Int) {
                         if (playbackState == ExoPlayer.STATE_READY && channel == playerState.activeChannel) {
@@ -161,19 +160,35 @@ fun PlayerScreen(
         playerState.playbackSpeed,
         playerState.currentPosition
     ) {
+
         activePlayer?.let { player ->
             player.playWhenReady = playerState.isPlaying
-            player.volume = if (playerState.isMuted) 0f else playerState.volume
             player.setPlaybackSpeed(playerState.playbackSpeed)
             if (playerState.currentPosition > 0) {
                 player.seekTo(playerState.currentPosition)
             }
         }
+
         exoPlayers.forEach { (channel, player) ->
             player.volume = if (channel == playerState.activeChannel && !playerState.isMuted) {
                 playerState.volume
             } else {
                 0f
+            }
+        }
+
+        while (playerState.isPlaying){
+            val position = activePlayer?.currentPosition ?: 0
+            currentPosition = position
+            delay(500)
+        }
+
+    }
+
+    DisposableEffect(exoPlayers) {
+        onDispose {
+            exoPlayers.values.forEach { player ->
+                player.release()
             }
         }
     }
@@ -219,7 +234,6 @@ fun PlayerScreen(
                                 PlayerChannelItem(
                                     channel = channel,
                                     player = exoPlayers[channel],
-                                    isActive = channel == playerState.activeChannel,
                                     zoom = playerState.zoom
                                 )
                             }
@@ -239,7 +253,8 @@ fun PlayerScreen(
                     onVolumeChange = onVolumeChange,
                     onSpeedChange = onSpeedChange,
                     onZoomChange = onZoomChange,
-                    onSeek = onSeek,
+                    onSetCurrentPositionSeek = onSetCurrentPosition,
+                    currentPosition = currentPosition
                 )
             }
         }
@@ -312,7 +327,7 @@ fun PlayerScreenPreview() {
         onVolumeChange = {},
         onMuteToggle = {},
         onZoomChange = {},
-        onSeek = {},
+        onSetCurrentPosition = {},
         onChannelSelected = {},
         onDurationChange = {},
         onSelectChannelsClicked = {}

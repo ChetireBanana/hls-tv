@@ -34,7 +34,6 @@ import com.example.hls_tv.data.model.Channel
 fun PlayerChannelItem(
     channel: Channel,
     player: ExoPlayer?,
-    isActive: Boolean = false,
     zoom: Float
 ) {
     Box(
@@ -52,7 +51,9 @@ fun PlayerChannelItem(
                 factory = { context ->
                     PlayerView(context).apply {
                         this.player = player
-                        useController = isActive
+                        useController = false
+                        controllerAutoShow = false
+                        controllerHideOnTouch = false
                         resizeMode = AspectRatioFrameLayout.RESIZE_MODE_FIT
                         layoutParams = FrameLayout.LayoutParams(
                             FrameLayout.LayoutParams.MATCH_PARENT,

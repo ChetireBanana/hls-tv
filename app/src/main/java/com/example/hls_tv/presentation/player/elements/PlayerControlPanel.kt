@@ -32,8 +32,8 @@ fun PlayerControlPanel(
     onVolumeChange: (Float) -> Unit,
     onSpeedChange: (Float) -> Unit,
     onZoomChange: (Float) -> Unit,
-    onSeek: (Long) -> Unit,
-    modifier: Modifier = Modifier
+    onSetCurrentPositionSeek: (Long) -> Unit,
+    currentPosition: Long
 ) {
     val duration = playerState.activeDurationMs.coerceAtLeast(1000L)
 
@@ -46,9 +46,9 @@ fun PlayerControlPanel(
         Row(verticalAlignment = Alignment.CenterVertically) {
 
             Slider(
-                value = playerState.currentPosition.toFloat(),
+                value = currentPosition.toFloat(),
                 onValueChange = {
-                    onSeek(it.toLong())
+                    onSetCurrentPositionSeek(it.toLong())
                 },
                 valueRange = 0f..duration.toFloat(),
                 modifier = Modifier.weight(1f)
@@ -231,6 +231,7 @@ fun PlayerControlPanelPreview() {
         onVolumeChange = {},
         onSpeedChange = {},
         onZoomChange = {},
-        onSeek = {}
+        onSetCurrentPositionSeek = {},
+        currentPosition = 30000L
     )
 }
