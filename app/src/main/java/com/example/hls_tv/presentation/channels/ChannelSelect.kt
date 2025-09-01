@@ -1,6 +1,11 @@
 package com.example.hls_tv.presentation.channels
 
 import android.widget.Toast
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -36,7 +41,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.hls_tv.R
 import com.example.hls_tv.data.model.Channel
@@ -108,18 +112,24 @@ fun ChannelsScreen(
                     stringResource(R.string.chosen_channels),
                     style = MaterialTheme.typography.titleMedium
                 )
-
-                if (state.selectedChannels.isNotEmpty()) {
+                AnimatedVisibility(
+                    visible = state.selectedChannels.isNotEmpty(),
+                    enter = fadeIn() + expandVertically(),
+                    exit = fadeOut() + shrinkVertically()
+                ) {
                     LazyColumn(
-                        modifier = Modifier.fillMaxWidth(),
+                        modifier = Modifier
+                            .fillMaxWidth()
                     ) {
                         items(state.selectedChannels) { channel ->
-                            ChannelItem(
-                                channel = channel,
-                                isSelected = false,
-                                canSelect = true,
-                                onChannelClick = onChannelSelected
-                            )
+                            Box(Modifier.animateItem()){
+                                ChannelItem(
+                                    channel = channel,
+                                    isSelected = false,
+                                    canSelect = true,
+                                    onChannelClick = onChannelSelected
+                                )
+                            }
                         }
                     }
                 }

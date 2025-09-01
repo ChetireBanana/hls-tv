@@ -1,6 +1,11 @@
 package com.example.hls_tv.presentation.channels.elements
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -40,16 +45,26 @@ fun ChannelGroupCard(
                 style = MaterialTheme.typography.titleMedium
             )
 
-            if (expanded) {
-                group.channels.forEach { channel ->
-                    ChannelItem(
-                        channel = channel,
-                        isSelected = selectedChannels.contains(channel),
-                        canSelect = selectedChannels.size < maxChannels || selectedChannels.contains(
-                            channel
-                        ),
-                        onChannelClick = { onChannelSelected(channel) }
-                    )
+            AnimatedVisibility(
+                visible = expanded,
+                enter = expandVertically(
+                    animationSpec = tween(durationMillis = 200)
+                ),
+                exit = shrinkVertically(
+                    animationSpec = tween(durationMillis = 200)
+                )
+            ) {
+                Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                    group.channels.forEach { channel ->
+                        ChannelItem(
+                            channel = channel,
+                            isSelected = selectedChannels.contains(channel),
+                            canSelect = selectedChannels.size < maxChannels || selectedChannels.contains(
+                                channel
+                            ),
+                            onChannelClick = { onChannelSelected(channel) }
+                        )
+                    }
                 }
             }
         }

@@ -4,6 +4,11 @@ import android.annotation.SuppressLint
 import android.content.res.Configuration
 import android.util.Log
 import android.widget.Toast
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -177,7 +182,7 @@ fun PlayerScreen(
             }
         }
 
-        while (playerState.isPlaying){
+        while (playerState.isPlaying) {
             val position = activePlayer?.currentPosition ?: 0
             currentPosition = position
             delay(500)
@@ -244,20 +249,32 @@ fun PlayerScreen(
         }
 
 
-        if (controlsVisible) {
-            Box(modifier = Modifier.align(Alignment.BottomCenter)) {
-                PlayerControlPanel(
-                    playerState = playerState,
-                    onPlayPause = onPlayPause,
-                    onMuteToggle = onMuteToggle,
-                    onVolumeChange = onVolumeChange,
-                    onSpeedChange = onSpeedChange,
-                    onZoomChange = onZoomChange,
-                    onSetCurrentPositionSeek = onSetCurrentPosition,
-                    currentPosition = currentPosition
-                )
-            }
+        AnimatedVisibility(
+            visible = controlsVisible,
+            enter = fadeIn() + expandVertically(
+                expandFrom = Alignment.Bottom
+            ),
+            exit = fadeOut() + shrinkVertically(
+                shrinkTowards = Alignment.Bottom
+            ),
+            modifier = Modifier.align(Alignment.BottomCenter)
+        ) {
+
+            PlayerControlPanel(
+                playerState = playerState,
+                onPlayPause = onPlayPause,
+                onMuteToggle = onMuteToggle,
+                onVolumeChange = onVolumeChange,
+                onSpeedChange = onSpeedChange,
+                onZoomChange = onZoomChange,
+                onSetCurrentPositionSeek = onSetCurrentPosition,
+                currentPosition = currentPosition
+            )
+
         }
+
+
+
 
         SmallFloatingActionButton(
             onClick = { controlsVisible = !controlsVisible },
